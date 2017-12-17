@@ -43,6 +43,8 @@
 #include <libsolidity/interface/Natspec.h>
 #include <libsolidity/interface/GasEstimator.h>
 
+#include <libsolidity/oraclize/OraclizePass.h>
+
 #include <libevmasm/Exceptions.h>
 
 #include <libdevcore/SwarmHash.h>
@@ -157,6 +159,32 @@ bool CompilerStack::analyze()
 	resolveImports();
 
 	bool noErrors = true;
+
+	if (m_oraclize)
+	{
+
+#ifdef COMPILER_DEBUG
+
+		cerr << "[Debug] Oraclize Pass: Start" << endl;
+
+#endif
+
+		/*********************/
+		/*** Oraclize Pass ***/
+		/*********************/
+
+		OraclizePass oracle(m_errorReporter, m_gasLimit, m_gasPrice);
+		for (Source const *source : m_sourceOrder)
+			if (!oracle.analyze(*source->ast))
+				noErrors = false;
+
+#ifdef COMPILER_DEBUG
+
+		cerr << "[Debug] Oraclize Pass: Finish" << endl;
+
+#endif
+	}
+
 	SyntaxChecker syntaxChecker(m_errorReporter);
 	for (Source const* source: m_sourceOrder)
 		if (!syntaxChecker.checkSyntax(*source->ast))
@@ -1014,4 +1042,19 @@ Json::Value CompilerStack::gasEstimates(string const& _contractName) const
 	}
 
 	return output;
+}
+
+void CompilerStack::setOraclize(bool oraclize)
+{
+	m_oraclize = oraclize;
+}
+
+void CompilerStack::setGasLimit(uint gasLimit)
+{
+	m_gasLimit = gasLimit;
+}
+
+void CompilerStack::setGasPrice(uint gasPrice)
+{
+	m_gasPrice = gasPrice;
 }
