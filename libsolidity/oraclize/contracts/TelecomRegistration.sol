@@ -149,7 +149,7 @@ contract TelecomRegistration is OraclizeSolidity {
   }
 
   function processTrade(uint8[] link_map, uint k) private {
-    oracleQuery("kds", link_map, k, finalize, true);	
+    oracleQuery("kds", link_map, k + 1, finalize, true);	
   }
 
   function finalize(string result) private {
