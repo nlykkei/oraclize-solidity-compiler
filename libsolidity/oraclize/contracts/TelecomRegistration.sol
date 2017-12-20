@@ -15,12 +15,11 @@ pragma solidity ^0.4.11;
 import "./OraclizeSolidity.sol";
 
 contract TelecomRegistration is OraclizeSolidity {
-
-  event LogEvent(string msg);
+  
   event LogEvent(string msg, uint region, address provider);
   event LogEvent(string msg, uint region, address provider, address buyer);
-  event LogFunds(string msg, uint funds, address sender);
-  event LogFunds(string msg, uint funds, address sender, address receiver);
+  event LogFunds(string msg, uint value, address provider);
+  event LogTransfer(string msg, uint value, address sender, address receiver);
 
   /*
    * List of registrered EOA's for telecom providers
@@ -33,7 +32,7 @@ contract TelecomRegistration is OraclizeSolidity {
   struct TelecomRegion {
     address provider;
     Sale sale;
-    bool[10] provider_links; // up := 1, down := 0
+    bool[NUM_REGIONS] provider_links; // up := 1, down := 0
   }
 
   struct Sale {
@@ -44,12 +43,12 @@ contract TelecomRegistration is OraclizeSolidity {
   struct PendingTrade {
     bool active;
     address buyer;
-    bool[10] buyer_links;
+    bool[NUM_REGIONS] buyer_links;
     uint8 region;
   }
 
   PendingTrade pending_trade;
-  TelecomRegion[10] telecom_regions;   
+  TelecomRegion[NUM_REGIONS] telecom_regions;   
 
   function TelecomRegistration() public payable {
     creator = msg.sender;
@@ -72,7 +71,7 @@ contract TelecomRegistration is OraclizeSolidity {
 
     // Check no pending trade
     if (pending_trade.active) {
-      LogEvent("Telecom trade: Fail: Pending trade already active");
+      LogEvent("Telecom trade: Fail: Pending trade already active", pending_trade.region, pending_trade.buyer);
       return;
     }
 
@@ -86,7 +85,7 @@ contract TelecomRegistration is OraclizeSolidity {
     }
 
     if (num_links < 2) {
-      LogEvent("Telecom trade: Must provide at least two links");
+      LogEvent("Telecom trade: Must provide at least two links", region, msg.sender);
       return;
     }
 
@@ -103,11 +102,11 @@ contract TelecomRegistration is OraclizeSolidity {
       pending_trade.buyer_links = buyer_links;
       pending_trade.region = region;
 
-      uint[] memory link_map = new uint[](NUM_REGIONS ** 2);
+      uint8[] memory link_map = new uint8[](NUM_REGIONS ** 2);
       for (i = 0; i < NUM_REGIONS - 1; ++i) {
         link_map[i * NUM_REGIONS + i] = 1;
         for (j = i + 1; j < NUM_REGIONS; ++j) { // (0,1),..,(0,n-1),(1,2),..,(1,n-1),..,(n-2,n-1)
-          uint link;
+          uint8 link;
           if (i == region) {
             link = buyer_links[j] || telecom_regions[j].provider_links[i] ? 1 : 0;
           } else if (j == region) {
@@ -149,7 +148,7 @@ contract TelecomRegistration is OraclizeSolidity {
     return telecom_regions[region].sale.forsale;
   }
 
-  function processTrade(uint[] link_map, uint k) private {
+  function processTrade(uint8[] link_map, uint k) private {
     oracleQuery("kds", link_map, k, finalize, true);	
   }
 
@@ -161,7 +160,7 @@ contract TelecomRegistration is OraclizeSolidity {
 
     LogEvent("Trading region: Success", pending_trade.region, telecom_regions[pending_trade.region].provider, pending_trade.buyer);
 
-    LogFunds("Trading region: Sending funds to seller", telecom_regions[pending_trade.region].sale.price, pending_trade.buyer, telecom_regions[pending_trade.region].provider);
+    LogTransfer("Trading region: Sending funds to seller", telecom_regions[pending_trade.region].sale.price, pending_trade.buyer, telecom_regions[pending_trade.region].provider);
     telecom_regions[pending_trade.region].provider.send(telecom_regions[pending_trade.region].sale.price);
 
     telecom_regions[pending_trade.region].provider = pending_trade.buyer;
@@ -178,7 +177,7 @@ contract TelecomRegistration is OraclizeSolidity {
 
   function destruct() public {
     if (msg.sender == creator) {
-        LogEvent("Destruct: Balance to creator");
+        LogTransfer("Destruct: Balance to creator", this.balance, address(this), creator);
         selfdestruct(creator);
     }
   }
