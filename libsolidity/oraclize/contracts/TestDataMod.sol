@@ -53,7 +53,7 @@ contract TestDataMod is usingOraclize
     /// Modified to query each URL and call specified callback with obtained results
     function updateFoo() public { 
       _oEnv0 = OEnv0({
-          urls: ["json(http://echo.jsontest.com/temp/5).temp", "json(http://echo.jsontest.com/temp/9).temp"],
+          urls: ["http://oraclize-solidity.herokuapp.com/echo/2", "http://oraclize-solidity.herokuapp.com/echo/3"],
           retVals: ["", ""],
           index: 0,
           queryId: bytes32(0)});
@@ -67,7 +67,7 @@ contract TestDataMod is usingOraclize
     /// Modified to query each URL and call specified callback with obtained results
     function updateBar() public {
       _oEnv1 = OEnv1({
-          urls: ["json(http://echo.jsontest.com/temp/5).temp", "json(http://echo.jsontest.com/temp/9).temp", "json(http://echo.jsontest.com/temp/7).temp"],
+          urls: ["http://oraclize-solidity.herokuapp.com/echo/4", "http://oraclize-solidity.herokuapp.com/echo/7", "http://oraclize-solidity.herokuapp.com/echo/1"],
           retVals: ["", "", ""],
           index: 0,
           queryId: bytes32(0)});
@@ -82,10 +82,10 @@ contract TestDataMod is usingOraclize
     function updateBaz() public {
       _oEnv2 = OEnv2({queryId: bytes32(0)});
 
-      _oEnv2.queryId = oraclize_query("URL", "json(http://echo.jsontest.com/temp/HellOWorld).temp");
+      _oEnv2.queryId = oraclize_query("URL", "http://oraclize-solidity.herokuapp.com/echo/HelloWorld");
 
       OraclizeEvent(_oEnv2.queryId, "updateBaz");
-      OraclizeEvent(_oEnv2.queryId, "json(http://echo.jsontest.com/temp/HellOWorld).temp");	
+      OraclizeEvent(_oEnv2.queryId, "http://oraclize-solidity.herokuapp.com/echo/HelloWorld");	
     }
 
     /// User-supplied callback function

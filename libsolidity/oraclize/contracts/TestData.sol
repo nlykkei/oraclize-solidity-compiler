@@ -25,17 +25,17 @@ contract TestData is OraclizeSolidity {
   /// Modified to query each URL and call specified callback with obtained results
   function updateFoo() public {
     2 + 3;
-    oracleQuery("data", "json(http://echo.jsontest.com/temp/2).temp", "json(http://echo.jsontest.com/temp/3).temp", processFoo);
+    oracleQuery("data", "http://oraclize-solidity.herokuapp.com/echo/2", "http://oraclize-solidity.herokuapp.com/echo/3", processFoo);
   }
 
   /// Modified to query each URL and call specified callback with obtained results
   function updateBar() public {
-    oracleQuery("data", "json(http://echo.jsontest.com/temp/4).temp", "json(http://echo.jsontest.com/temp/7).temp", "json(http://echo.jsontest.com/temp/1).temp", processBar);	
+    oracleQuery("data", "http://oraclize-solidity.herokuapp.com/echo/4", "http://oraclize-solidity.herokuapp.com/echo/7", "http://oraclize-solidity.herokuapp.com/echo/1", processBar);	
   }
 
   /// Modified to query each URL and call specified callback with obtained results
   function updateBaz() public {
-    oracleQuery("data", "json(http://echo.jsontest.com/temp/HelloWorld).temp", processBaz);	
+    oracleQuery("data", "http://oraclize-solidity.herokuapp.com/echo/HelloWorld", processBaz);	
   }
 
   /// User-supplied callback function

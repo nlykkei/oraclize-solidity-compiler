@@ -20,7 +20,7 @@
 
 #define COMPILER_DEBUG ///< Enable/disable compiler debugging
 #undef AST_DEBUG       ///< Enable/disable AST debugging
-#undef CONTRACT_DEBUG  ///< Enable/disable contract debugging
+#define CONTRACT_DEBUG  ///< Enable/disable contract debugging
 
 #undef UINT_256 ///< Enable/disable uint256 type
 

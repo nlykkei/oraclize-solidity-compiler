@@ -118,7 +118,7 @@ echo
 
 #contract instance
 echo "
-var ci = ct.new({from: eth.accounts[0], data: \"0x\" + contract_content.contracts[\"${CONTRACT}:${CONTRACT_NAME}\"].bin, gas: gas_value, value: 100000000000000000000}, 
+var ci = ct.new({from: eth.accounts[0], data: \"0x\" + contract_content.contracts[\"${CONTRACT}:${CONTRACT_NAME}\"].bin, gas: gas_value, value: 100000000000000000}, 
     function (e, contract) {
         console.log(e, contract);
         if (typeof contract.address !== 'undefined') {
